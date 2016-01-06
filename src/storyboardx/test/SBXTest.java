@@ -31,7 +31,7 @@ public class SBXTest extends Application {
     public void start(Stage primaryStage) throws Exception {
         Group root = new Group();
         double w = 1400;
-        double h = 12;
+        double h = 10;
         primaryStage.setWidth(w);
         Scene scene = new Scene(root);
         scene.setFill(Color.BLACK);

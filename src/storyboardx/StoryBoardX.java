@@ -12,6 +12,7 @@ import javafx.scene.Group;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import storyboardx.ui.SBXActionHandler;
 import storyboardx.ui.SBXTimeBar;
@@ -22,55 +23,55 @@ import storyboardx.ui.SBXTimeBar;
  */
 public class StoryBoardX {
 
-    private final VBox barBox;
-    private final ScrollPane barContainer;
     private final ArrayList<SBXEventBar> barList;
+    private double barBoxY = 0.0;
+    private double viewerY = 0.0;
+    private SBXEventViewer viewer;
+    private SBXTimeBar timeBar;
+    private final Pane mainPane;
 
     public StoryBoardX(Group root) {
-        barBox = new VBox();
-        barContainer = new ScrollPane();
+        mainPane = new Pane();
         barList = new ArrayList<>();
         init(root);
     }
 
     private void init(Group root) {
         double w = 1400;
-
-        AnchorPane mainPane = new AnchorPane();
-
-        BorderPane upperPane = new BorderPane();
-        SBXTimeBar timeBar = new SBXTimeBar(w, 20);
+        timeBar = new SBXTimeBar(w);
         SBXManager.getInstance().setTimeBar(timeBar);
-        upperPane.setTop(timeBar);
-        barContainer.setContent(barBox);
-        upperPane.setCenter(barContainer);
+        barBoxY = timeBar.getBoundsInLocal().getHeight() * 3;
+        viewerY = barBoxY;
 
-        SBXEventViewer viewer = new SBXEventViewer(w);
+        viewer = new SBXEventViewer(w);
         SBXManager.getInstance().setViewer(viewer);
 
-        AnchorPane.setTopAnchor(upperPane, 0.0);
-        AnchorPane.setBottomAnchor(viewer, -60.0);
-        mainPane.getChildren().addAll(upperPane, viewer);
-
-        root.getChildren().addAll(mainPane);
+        mainPane.getChildren().addAll(timeBar, viewer);
 
         SBXActionHandler handler = new SBXActionHandler();
 
         mainPane.setOnMouseMoved(handler.getMouseHandler());
         mainPane.setOnMouseExited(handler.getMouseHandler());
-//        mainpane.setOnDragDetected(handler.getMouseHandler());
-//        mainpane.setOnKeyPressed(handler.getKeyHandler());
-//        mainpane.setOnZoom(handler.getZoomHandler());
-//        mainpane.setOnDragOver(handler.getDragHandler());
-        
-//        Line line = new Line(0, 0, 0, 100);
-//        line.setFill(Color.MAGENTA);
-//        line.setTranslateX(333);
-//        barContainer.getChildren().add(line);
+         //        mainpane.setOnDragDetected(handler.getMouseHandler());
+        //        mainpane.setOnKeyPressed(handler.getKeyHandler());
+        //        mainpane.setOnZoom(handler.getZoomHandler());
+        //        mainpane.setOnDragOver(handler.getDragHandler());
+
+         //        Line line = new Line(0, 0, 0, 100);
+        //        line.setFill(Color.MAGENTA);
+        //        line.setTranslateX(333);
+        //        barContainer.getChildren().add(line);
+        root.getChildren().addAll(mainPane);
     }
 
     public void addEventBar(SBXEventBar bar) {
-        barBox.getChildren().add(bar);
+        mainPane.getChildren().removeAll(viewer, timeBar);
+        bar.setTranslateY(viewerY);
+        mainPane.getChildren().add(bar);
         barList.add(bar);
+        viewerY += bar.getBoundsInLocal().getHeight() + 1;
+        viewer.setTranslateY(viewerY + 2);
+        mainPane.getChildren().addAll(viewer, timeBar);
+        timeBar.setLineVerticalPosition(barBoxY, viewerY-barBoxY);
     }
 }

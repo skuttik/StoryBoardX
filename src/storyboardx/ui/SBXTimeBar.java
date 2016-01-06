@@ -31,7 +31,7 @@ public class SBXTimeBar extends Pane {
     private final Polygon currentLine;
     private final double width;
 
-    public SBXTimeBar(double width, double height) {
+    public SBXTimeBar(double width) {
         this.width = width;
 
         VBox main = new VBox(5);
@@ -60,14 +60,13 @@ public class SBXTimeBar extends Pane {
         currentArrow = new Polygon(-6, 0, 6, 0, 0, 12);
         currentArrow.setFill(Color.ALICEBLUE);
 
-        int lineW = 1;
-        int lineH = 60;
-        currentLine = new Polygon(-lineW, 0, -lineW, lineH, lineW, lineH, lineW, 0);
+        currentLine = new Polygon();
         currentLine.setFill(new Color(1.0, 1.0, 1.0, 1.0));
         currentLine.setStroke(new Color(1.0, 1.0, 1.0, 1.0));
         currentLine.setBlendMode(BlendMode.EXCLUSION);
 
         getChildren().addAll(start, end, currentArrow, currentText, currentLine);
+        setMouseTransparent(true);
 
         clearCurrentDate();
     }
@@ -84,7 +83,7 @@ public class SBXTimeBar extends Pane {
     }
 
     public void updateCurrentDate(Date currentDate, double x) {
-        currentText.setText(DateFormat.getDateTimeInstance().format(currentDate));
+        currentText.setText(DateFormat.getDateTimeInstance().format(currentDate)+" ("+(int)(x/width*100.0)+"%)");
         int dim = (int) (currentText.getBoundsInLocal().getWidth());
         currentText.setTranslateX(x - (dim * x / width));
         currentArrow.setTranslateX(x);
@@ -97,5 +96,23 @@ public class SBXTimeBar extends Pane {
         currentText.setText("");
         currentArrow.setVisible(false);
         currentLine.setVisible(false);
+    }
+
+    public void setLineVerticalPosition(double lineY, double lineH) {
+        double lineW = 1;
+
+        currentLine.getPoints().remove(0, currentLine.getPoints().size());
+
+        currentLine.getPoints().add(-lineW);
+        currentLine.getPoints().add(lineY);
+
+        currentLine.getPoints().add(lineW);
+        currentLine.getPoints().add(lineY);
+
+        currentLine.getPoints().add(lineW);
+        currentLine.getPoints().add(lineY + lineH);
+
+        currentLine.getPoints().add(-lineW);
+        currentLine.getPoints().add(lineY + lineH);
     }
 }
