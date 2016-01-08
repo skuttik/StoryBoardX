@@ -39,7 +39,7 @@ public class SBXEventImpl implements SBXEvent {
 
     @Override
     public String getDescription() {
-        return "Long description for " + name + " of type" + type;
+        return "Long description for " + name + " of type " + type;
     }
 
     @Override

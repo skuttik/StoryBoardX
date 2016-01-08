@@ -6,14 +6,12 @@
 package storyboardx;
 
 import java.util.ArrayList;
+import java.util.Date;
 import storyboardx.ui.SBXEventViewer;
 import storyboardx.ui.SBXEventBar;
 import javafx.scene.Group;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 import storyboardx.ui.SBXActionHandler;
 import storyboardx.ui.SBXTimeBar;
 
@@ -29,16 +27,21 @@ public class StoryBoardX {
     private SBXEventViewer viewer;
     private SBXTimeBar timeBar;
     private final Pane mainPane;
+    private double w = 1500;
 
-    public StoryBoardX(Group root) {
+    public StoryBoardX(Group root, double w) {
         mainPane = new Pane();
         barList = new ArrayList<>();
+        this.w = w;
         init(root);
     }
 
     private void init(Group root) {
-        double w = 1400;
-        timeBar = new SBXTimeBar(w);
+        
+        mainPane.prefWidthProperty().bind(root.getScene().widthProperty());
+        timeBar = new SBXTimeBar(mainPane.prefWidthProperty());
+        
+        
         SBXManager.getInstance().setTimeBar(timeBar);
         barBoxY = timeBar.getBoundsInLocal().getHeight() * 3;
         viewerY = barBoxY;
@@ -52,15 +55,15 @@ public class StoryBoardX {
 
         mainPane.setOnMouseMoved(handler.getMouseHandler());
         mainPane.setOnMouseExited(handler.getMouseHandler());
-         //        mainpane.setOnDragDetected(handler.getMouseHandler());
-        //        mainpane.setOnKeyPressed(handler.getKeyHandler());
-        //        mainpane.setOnZoom(handler.getZoomHandler());
-        //        mainpane.setOnDragOver(handler.getDragHandler());
+        mainPane.setOnMouseExited(handler.getMouseHandler());
 
-         //        Line line = new Line(0, 0, 0, 100);
-        //        line.setFill(Color.MAGENTA);
-        //        line.setTranslateX(333);
-        //        barContainer.getChildren().add(line);
+        mainPane.setOnMouseDragged(handler.getMouseHandler());
+        mainPane.setOnMouseDragExited(handler.getMouseHandler());
+
+//        mainPane.setOnDragDone(handler.getDragHandler());
+//        mainPane.setOnDragOver(handler.getDragHandler());
+//        mainPane.setOnKeyPressed(handler.getKeyHandler());
+//        mainPane.setOnZoom(handler.getZoomHandler());
         root.getChildren().addAll(mainPane);
     }
 
@@ -72,6 +75,10 @@ public class StoryBoardX {
         viewerY += bar.getBoundsInLocal().getHeight() + 1;
         viewer.setTranslateY(viewerY + 2);
         mainPane.getChildren().addAll(viewer, timeBar);
-        timeBar.setLineVerticalPosition(barBoxY, viewerY-barBoxY);
+        timeBar.setLineVerticalPosition(barBoxY, viewerY - barBoxY);
+    }
+
+    public void addEventBar(Date sd, long td) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

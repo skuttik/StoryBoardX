@@ -22,10 +22,12 @@ import storyboardx.data.SBXEvent;
 public class SBXEventViewer extends Pane {
 
     public static double height = 56;
+    private final Text identification;
     private final Text timeInfo;
     private final Text description;
     private final ImageView icon1;
     private final ImageView icon2;
+    private final ImageView icon3;
     private final Rectangle backgroundBar;
 
     public SBXEventViewer(double width) {
@@ -35,8 +37,8 @@ public class SBXEventViewer extends Pane {
         icon1.translateYProperty().set(4);
         icon1.setVisible(false);
 
-        description = new Text("");
-        description.setFill(Color.BEIGE);
+        identification = new Text("");
+        identification.setFill(Color.BEIGE);
 
         icon2 = new ImageView(new Image(getClass().getResourceAsStream("resources/stopwatch.png")));
         icon2.translateYProperty().set(4);
@@ -44,9 +46,16 @@ public class SBXEventViewer extends Pane {
 
         timeInfo = new Text("");
         timeInfo.setFill(Color.BEIGE);
-        timeInfo.setWrappingWidth(400);
+        timeInfo.setWrappingWidth(160);
 
-        main.getChildren().addAll(new Text(""), icon1, description, new Text(""), icon2, timeInfo);
+        icon3 = new ImageView(new Image(getClass().getResourceAsStream("resources/bell.png")));
+        icon3.translateYProperty().set(4);
+        icon3.setVisible(false);
+
+        description = new Text("");
+        description.setFill(Color.BEIGE);
+
+        main.getChildren().addAll(new Text(""), icon1, identification, new Text(""), icon2, timeInfo, new Text(""), icon3, description);
 
         backgroundBar = new Rectangle(width, height, new Color(0.9, 0.9, 0.9, 0.4));
 
@@ -59,17 +68,21 @@ public class SBXEventViewer extends Pane {
     public final void clearEventInfo() {
         backgroundBar.setVisible(false);
         icon1.setVisible(false);
-        timeInfo.setText("");
+        identification.setText("");
         icon2.setVisible(false);
+        timeInfo.setText("");
+        icon3.setVisible(false);
         description.setText("");
     }
 
     public void displayEventInfo(SBXEvent event) {
         backgroundBar.setVisible(true);
         icon1.setVisible(true);
-        description.setText(event.getType() + ":\n" + event.getName());
+        identification.setText(event.getType() + ":\n" + event.getName());
         icon2.setVisible(true);
         timeInfo.setText(DateFormat.getDateTimeInstance().format(event.getRefTime()) + "\n"+ event.getDuration()/1000.0 + " s");
+        icon3.setVisible(true);
+        description.setText(event.getDescription());
     }
 
 }

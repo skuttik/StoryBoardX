@@ -22,8 +22,12 @@ public class SBXActionHandler {
     private final EventHandler<KeyEvent> keyHandler;
     private final EventHandler<ZoomEvent> zoomHandler;
     private final EventHandler<DragEvent> dragHandler;
+    private boolean onDragging;
+    private double dragStartX;
 
     public SBXActionHandler() {
+        onDragging = false;
+        dragStartX = 0;
         mouseHandler = (MouseEvent event) -> {
             switch (event.getEventType().getName()) {
                 case "MOUSE_MOVED":
@@ -31,6 +35,15 @@ public class SBXActionHandler {
                     break;
                 case "MOUSE_EXITED":
                     SBXManager.getInstance().setCurrentPointer(-1.0);
+                    break;
+                case "MOUSE_DRAGGED":
+                    if (onDragging) {
+                        double drag = event.getX() - dragStartX;
+                        System.out.println(event.getEventType().getName() + ": " + drag);
+                    } else {
+                        onDragging = true;
+                        dragStartX = event.getX();
+                    }
                     break;
                 default:
                     System.out.println("mouse: " + event.getEventType().getName());
@@ -47,7 +60,6 @@ public class SBXActionHandler {
 
         dragHandler = (DragEvent event) -> {
             System.out.println("drag: " + event.getX());
-
         };
     }
 

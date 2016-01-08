@@ -23,7 +23,6 @@ import storyboardx.ui.SBXEventViewer;
  */
 public class SBXTest extends Application {
 
-    
     public SBXTest() {
     }
 
@@ -32,54 +31,56 @@ public class SBXTest extends Application {
         Group root = new Group();
         double w = 1400;
         double h = 10;
-        primaryStage.setWidth(w);
-        Scene scene = new Scene(root);
+//        primaryStage.setWidth(w);
+        Scene scene = new Scene(root,w,100);
         scene.setFill(Color.BLACK);
         primaryStage.setScene(scene);
 
-        StoryBoardX sbx = new StoryBoardX(root);
+        StoryBoardX sbx = new StoryBoardX(root, primaryStage.getWidth());
 
         long td = 120000;
         Date sd = new Date(new Date().getTime() - td);
+        double scale = w / td;
 
         createEvents("test", 5, sd.getTime(), td);
-        SBXEventBar bar = new SBXEventBar(w, h, "test");
-        bar.init(sd, td);
+        SBXEventBar bar = new SBXEventBar(h, "test");
+        bar.init(sd, td, scale);
         sbx.addEventBar(bar);
+        sbx.addEventBar(sd, td);
 
         createEvents("abc", 8, sd.getTime(), td);
-        SBXEventBar bar1 = new SBXEventBar(w, h, "abc");
-        bar1.init(sd, td);
+        SBXEventBar bar1 = new SBXEventBar(h, "abc");
+        bar1.init(sd, td, scale);
         sbx.addEventBar(bar1);
 
         createEvents("qwerty", 8, sd.getTime(), td);
-        SBXEventBar bar2 = new SBXEventBar(w, h, "qwerty");
-        bar2.init(sd, td);
+        SBXEventBar bar2 = new SBXEventBar(h, "qwerty");
+        bar2.init(sd, td, scale);
         sbx.addEventBar(bar2);
 
         createEvents("poi", 8, sd.getTime(), td);
-        SBXEventBar bar3 = new SBXEventBar(w, h, "poi");
-        bar3.init(sd, td);
+        SBXEventBar bar3 = new SBXEventBar(h, "poi");
+        bar3.init(sd, td, scale);
         sbx.addEventBar(bar3);
 
         createEvents("kkk", 5, sd.getTime(), td);
-        SBXEventBar bar4 = new SBXEventBar(w, h, "kkk");
-        bar4.init(sd, td);
+        SBXEventBar bar4 = new SBXEventBar(h, "kkk");
+        bar4.init(sd, td, scale);
         sbx.addEventBar(bar4);
 
         createEvents("ttt", 8, sd.getTime(), td);
-        SBXEventBar bar5 = new SBXEventBar(w, h, "ttt");
-        bar5.init(sd, td);
+        SBXEventBar bar5 = new SBXEventBar(h, "ttt");
+        bar5.init(sd, td, scale);
         sbx.addEventBar(bar5);
 
         createEvents("zxc", 8, sd.getTime(), td);
-        SBXEventBar bar6 = new SBXEventBar(w, h, "zxc");
-        bar6.init(sd, td);
+        SBXEventBar bar6 = new SBXEventBar(h, "zxc");
+        bar6.init(sd, td, scale);
         sbx.addEventBar(bar6);
 
         primaryStage.setHeight(50 + SBXManager.getInstance().getEventTypes().size() * 45 + SBXEventViewer.height);
         primaryStage.show();
-        SBXManager.getInstance().setTimeWindow(sd, td, w/td);
+        SBXManager.getInstance().setTimeWindow(sd, td, w / td);
     }
 
     private void createEvents(String type, int num, long startTime, long duration) {

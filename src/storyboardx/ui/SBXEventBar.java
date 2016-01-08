@@ -22,7 +22,6 @@ import storyboardx.data.SBXEventManager;
  */
 public class SBXEventBar extends Pane implements SBXEventListener {
 
-    private final double width;
     private final double space;
     private double scale;
     private final double height;
@@ -30,15 +29,9 @@ public class SBXEventBar extends Pane implements SBXEventListener {
     private Date startDate;
     private final SBXEventManager manager;
 
-    public SBXEventBar(double width, double height, String eventType) {
-        this.width = width;
+    public SBXEventBar(double height, String eventType) {
         this.height = height;
         this.space = Math.rint(height / 3.0);
-        Rectangle bar = new Rectangle(width, height + 2.0 * space, Color.DIMGREY);
-        bar.setStrokeWidth(height * .06);
-        bar.setStrokeType(StrokeType.INSIDE);
-        bar.setStroke(Color.DARKGRAY);
-        getChildren().add(bar);
         numOfEvents = 0;
         scale = 0;
         if (eventType != null && !eventType.isEmpty()) {
@@ -48,9 +41,18 @@ public class SBXEventBar extends Pane implements SBXEventListener {
         }
     }
 
-    public void init(Date startDate, long totalDuration) {
-        scale = width / (double) totalDuration;
+    public void init(Date startDate, long totalDuration, double scale) {
+        double width = (double) totalDuration * scale;
+//        double width =   mainPane.prefWidthProperty().bind(root.getScene().widthProperty());
         this.startDate = startDate;
+        this.scale = scale;
+        
+        Rectangle bar = new Rectangle(width, height + 2.0 * space, Color.DIMGREY);
+        bar.setStrokeWidth(height * .06);
+        bar.setStrokeType(StrokeType.INSIDE);
+        bar.setStroke(Color.DARKGRAY);
+        getChildren().add(bar);
+        
         clearAllEvents();
         if (manager != null) {
             manager.getFilteredEvents(startDate, new Date(startDate.getTime() + totalDuration), null, null)
