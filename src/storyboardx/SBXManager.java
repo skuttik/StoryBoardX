@@ -22,7 +22,6 @@ public class SBXManager {
     private static SBXManager instance = null;
     private SBXEventViewer viewer = null;
     private SBXTimeBar timeBar = null;
-    private double scale;
     private Date startDate;
     private long totalDuration;
     private final HashMap<String, SBXEventManager> managerMap;
@@ -68,23 +67,20 @@ public class SBXManager {
         this.timeBar = timeBar;
     }
 
-    public void setTimeWindow(Date startDate, long totalDuration, double scale) {
+    public void setTimeWindow(Date startDate, long totalDuration) {
         if (timeBar != null) {
             timeBar.set(startDate, totalDuration);
         }
         this.startDate = startDate;
         this.totalDuration = totalDuration;
-        this.scale = scale;
     }
 
     public void setCurrentPointer(double pointerX) {
         if (timeBar != null) {
-            if (pointerX < 0.0 || pointerX / scale > totalDuration) {
+            if (pointerX < 0.0) {
                 timeBar.clearCurrentDate();
             } else {
-                long delta = (long) (pointerX / scale);
-                Date currDate = new Date(startDate.getTime() + delta);
-                timeBar.updateCurrentDate(currDate, pointerX);
+                timeBar.updateCurrentDate(startDate.getTime(), totalDuration, pointerX);
             }
         }
     }

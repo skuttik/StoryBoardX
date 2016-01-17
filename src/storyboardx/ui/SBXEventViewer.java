@@ -48,7 +48,7 @@ public class SBXEventViewer extends Pane {
         timeInfo.setFill(Color.BEIGE);
         timeInfo.setWrappingWidth(160);
 
-        icon3 = new ImageView(new Image(getClass().getResourceAsStream("resources/bell.png")));
+        icon3 = new ImageView(new Image(getClass().getResourceAsStream("resources/info.png")));
         icon3.translateYProperty().set(4);
         icon3.setVisible(false);
 
@@ -78,11 +78,20 @@ public class SBXEventViewer extends Pane {
     public void displayEventInfo(SBXEvent event) {
         backgroundBar.setVisible(true);
         icon1.setVisible(true);
-        identification.setText(event.getType() + ":\n" + event.getName());
         icon2.setVisible(true);
-        timeInfo.setText(DateFormat.getDateTimeInstance().format(event.getRefTime()) + "\n"+ event.getDuration()/1000.0 + " s");
         icon3.setVisible(true);
-        description.setText(event.getDescription());
+
+        identification.setText(event.getType() + ":\n   " + event.getName());
+        timeInfo.setText(DateFormat.getDateTimeInstance().format(event.getRefTime()) + "\n" + event.getDuration() / 1000.0 + " s");
+        description.setText(event.getDescription()+"\n");
+
+        icon1.translateYProperty().set((height - icon1.getBoundsInLocal().getHeight()) / 2.0);
+        icon2.translateYProperty().set((height - icon2.getBoundsInLocal().getHeight()) / 2.0);
+        icon3.translateYProperty().set((height - icon3.getBoundsInLocal().getHeight()) / 2.0);
+        identification.translateYProperty().set((height - identification.getBoundsInLocal().getHeight()) / 2.0);
+        timeInfo.translateYProperty().set((height - timeInfo.getBoundsInLocal().getHeight()) / 2.0);
+        description.translateYProperty().set((height - description.getBoundsInLocal().getHeight()) / 2.0);
+
     }
 
 }

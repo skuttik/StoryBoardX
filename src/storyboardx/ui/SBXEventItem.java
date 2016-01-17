@@ -5,7 +5,13 @@
  */
 package storyboardx.ui;
 
+import com.sun.javafx.property.adapter.PropertyDescriptor;
+import java.util.ArrayList;
 import java.util.Date;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.ReadOnlyDoubleProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
@@ -22,92 +28,178 @@ import storyboardx.SBXManager;
  */
 public class SBXEventItem implements EventHandler<MouseEvent> {
 
-    private final double refHeight;
-    private final double refSpace;
-    private final Rectangle rect1;
-    private final Circle circle1;
     private final SBXEvent event;
+    private final double refHeight;
+    private final double circleRadius;
+    private final double refSpace;
+    private final Date startDate;
+    private final ReadOnlyDoubleProperty refSize;
+    private final int totalDuration;
+    private final ArrayList<Shape> shapes;
+    private final ArrayList<Color> borderColors;
+    private final ArrayList<Color> fillColors;
+    private final ArrayList<StrokeType> stroke;
+    private boolean selected;
+    private boolean mousein;
 
-    public SBXEventItem(double scale, double refHeight, double refSpace, Date startDate, SBXEvent event) {
-        double len = event.getDuration() * scale;
-        double pos = (double) (event.getRefTime().getTime() - startDate.getTime()) * scale;
-        this.event = event;
+    public enum ColorScheme {
+
+        LIGHTYELLOW,
+        SKY
+    };
+
+    private enum DisplayMode {
+
+        DEFAULT_MODE,
+        HIGHLIGHTED_MODE,
+        SELECTED_MODE,
+        HIGHLIGHTED_SELECTED_MODE
+    }
+
+    public SBXEventItem(double refHeight, double refSpace, Date startDate, int totalDuration, SBXEvent event, ReadOnlyDoubleProperty refSize, ColorScheme colScheme) {
         this.refHeight = refHeight;
+        this.circleRadius = refHeight * .35;
         this.refSpace = refSpace;
-        if (len < refHeight) {
-            circle1 = new Circle(refHeight * 0.4);
-            circle1.setFill(Color.STEELBLUE);
-            circle1.setCenterX(pos);
-            circle1.setCenterY(refSpace + refHeight / 2.0);
-            circle1.setStroke(Color.LIGHTSKYBLUE);
-            circle1.setStrokeWidth(refHeight * .08);
-            circle1.setStrokeType(StrokeType.INSIDE);
-            rect1 = null;
-        } else {
-            rect1 = new Rectangle(len, refHeight);
-            rect1.setFill(Color.BURLYWOOD);
-            rect1.setX(pos);
-            rect1.setY(refSpace);
-            rect1.setStroke(Color.LIGHTYELLOW);
-            rect1.setStrokeWidth(refHeight * .08);
-            rect1.setStrokeType(StrokeType.INSIDE);
-            circle1 = null;
+        this.startDate = startDate;
+        this.totalDuration = totalDuration;
+        this.event = event;
+        this.refSize = refSize;
+        this.shapes = new ArrayList<>();
+        this.borderColors = new ArrayList<>();
+        this.fillColors = new ArrayList<>();
+        switch (colScheme) {
+            case LIGHTYELLOW:
+                this.borderColors.add(DisplayMode.DEFAULT_MODE.ordinal(), Color.LIGHTYELLOW);
+                this.borderColors.add(DisplayMode.HIGHLIGHTED_MODE.ordinal(), Color.RED);
+                this.borderColors.add(DisplayMode.SELECTED_MODE.ordinal(), Color.GREENYELLOW);
+                this.borderColors.add(DisplayMode.HIGHLIGHTED_SELECTED_MODE.ordinal(), Color.RED);
+
+                this.fillColors.add(DisplayMode.DEFAULT_MODE.ordinal(), Color.BURLYWOOD);
+                this.fillColors.add(DisplayMode.HIGHLIGHTED_MODE.ordinal(), Color.BURLYWOOD);
+                this.fillColors.add(DisplayMode.SELECTED_MODE.ordinal(), Color.LIGHTYELLOW);
+                this.fillColors.add(DisplayMode.HIGHLIGHTED_SELECTED_MODE.ordinal(), Color.LIGHTYELLOW);
+
+                break;
+
+            case SKY:
+                this.borderColors.add(DisplayMode.DEFAULT_MODE.ordinal(), Color.LINEN);
+                this.borderColors.add(DisplayMode.HIGHLIGHTED_MODE.ordinal(), Color.RED);
+                this.borderColors.add(DisplayMode.SELECTED_MODE.ordinal(), Color.LIME);
+                this.borderColors.add(DisplayMode.HIGHLIGHTED_SELECTED_MODE.ordinal(), Color.RED);
+
+                this.fillColors.add(DisplayMode.DEFAULT_MODE.ordinal(), Color.CORNFLOWERBLUE);
+                this.fillColors.add(DisplayMode.HIGHLIGHTED_MODE.ordinal(), Color.CORNFLOWERBLUE);
+                this.fillColors.add(DisplayMode.SELECTED_MODE.ordinal(), Color.BLUE);
+                this.fillColors.add(DisplayMode.HIGHLIGHTED_SELECTED_MODE.ordinal(), Color.BLUE);
+
+                break;
+
+            default:
         }
-        attachEvents();
+
+        this.stroke = new ArrayList<>();
+        stroke.add(DisplayMode.DEFAULT_MODE.ordinal(), StrokeType.INSIDE);
+        stroke.add(DisplayMode.HIGHLIGHTED_MODE.ordinal(), StrokeType.OUTSIDE);
+        stroke.add(DisplayMode.SELECTED_MODE.ordinal(), StrokeType.INSIDE);
+        stroke.add(DisplayMode.HIGHLIGHTED_SELECTED_MODE.ordinal(), StrokeType.OUTSIDE);
+
+        create();
     }
 
     private void attachEvents() {
-        getShape().setOnMouseClicked(this);
-        getShape().setOnMouseEntered(this);
-        getShape().setOnMouseExited(this);
+        shapes.forEach(s -> {
+            s.setOnMouseClicked(this);
+            s.setOnMouseEntered(this);
+            s.setOnMouseExited(this);
+        });
+        refSize.addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
+            System.out.println("changed " + observable + ":" + oldValue + "->" + newValue);
+            redraw();
+        });
     }
 
     @Override
     public void handle(MouseEvent mev) {
-//        System.out.println(mev.getEventType().getName() + ":" + event.getDescrption());
         switch (mev.getEventType().getName()) {
             case "MOUSE_ENTERED":
-                setMode(true);
+                mousein = true;
                 SBXManager.getInstance().displayEventInfo(event);
                 break;
             case "MOUSE_EXITED":
-                setMode(false);
+                mousein = false;
                 SBXManager.getInstance().clearEventInfo();
                 break;
             case "MOUSE_CLICKED":
+                selected = !selected;
                 System.out.println(event.getDescription());
                 break;
             default:
                 System.out.println(mev.getEventType().getName());
                 break;
         }
-    }
-
-    public Shape getShape() {
-        if (rect1 != null) {
-            return rect1;
+        if (selected) {
+            if (mousein) {
+                setMode(DisplayMode.HIGHLIGHTED_SELECTED_MODE);
+            } else {
+                setMode(DisplayMode.SELECTED_MODE);
+            }
         } else {
-            return circle1;
+            if (mousein) {
+                setMode(DisplayMode.HIGHLIGHTED_MODE);
+            } else {
+                setMode(DisplayMode.DEFAULT_MODE);
+            }
         }
     }
 
-    private void setMode(boolean highlightened) {
-        if (rect1 != null) {
-            if (highlightened) {
-                rect1.setStroke(Color.RED);
-                rect1.setStrokeType(StrokeType.OUTSIDE);
+    public ArrayList<Shape> getShape() {
+        return shapes;
+    }
+
+    private void setMode(DisplayMode mode) {
+        shapes.forEach(s -> {
+            s.setStroke(borderColors.get(mode.ordinal()));
+            s.setStrokeType(StrokeType.OUTSIDE);
+            s.setFill(fillColors.get(mode.ordinal()));
+            if (mode == DisplayMode.HIGHLIGHTED_MODE || mode == DisplayMode.HIGHLIGHTED_SELECTED_MODE) {
+                s.setStrokeWidth(refHeight * .2);
             } else {
-                rect1.setStroke(Color.LIGHTYELLOW);
-                rect1.setStrokeType(StrokeType.INSIDE);
+                s.setStrokeWidth(refHeight * .08);
             }
+        });
+    }
+
+    private void create() {
+        Circle circle1 = new Circle(circleRadius);
+        circle1.setStrokeWidth(refHeight * .08);
+        circle1.setCenterY(refSpace + refHeight / 2.0);
+        circle1.setVisible(false);
+        shapes.add(circle1);
+
+        Rectangle rect1 = new Rectangle(refHeight, refHeight);
+        rect1.setY(refSpace);
+        rect1.setStrokeWidth(refHeight * .08);
+        rect1.setVisible(false);
+        shapes.add(rect1);
+
+        selected = false;
+        setMode(DisplayMode.DEFAULT_MODE);
+        attachEvents();
+    }
+
+    private void redraw() {
+        double factor = refSize.get() / totalDuration;
+        double len = event.getDuration() * factor;
+        double pos = (double) (event.getRefTime().getTime() - startDate.getTime()) * factor;
+        if (len < circleRadius) {
+            shapes.get(0).setVisible(true);
+            ((Circle) shapes.get(0)).setCenterX(pos);
+            shapes.get(1).setVisible(false);
         } else {
-            if (highlightened) {
-                circle1.setStroke(Color.RED);
-                circle1.setStrokeType(StrokeType.OUTSIDE);
-            } else {
-                circle1.setStroke(Color.LIGHTSKYBLUE);
-                circle1.setStrokeType(StrokeType.INSIDE);
-            }
+            shapes.get(0).setVisible(false);
+            shapes.get(1).setVisible(true);
+            ((Rectangle) shapes.get(1)).setWidth(len);
+            ((Rectangle) shapes.get(1)).setX(pos);
         }
     }
 }

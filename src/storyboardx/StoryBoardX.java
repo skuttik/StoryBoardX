@@ -11,8 +11,8 @@ import storyboardx.ui.SBXEventViewer;
 import storyboardx.ui.SBXEventBar;
 import javafx.scene.Group;
 import javafx.scene.layout.Pane;
-import javafx.stage.Stage;
 import storyboardx.ui.SBXActionHandler;
+import storyboardx.ui.SBXEventItem;
 import storyboardx.ui.SBXTimeBar;
 
 /**
@@ -37,11 +37,11 @@ public class StoryBoardX {
     }
 
     private void init(Group root) {
-        
+
         mainPane.prefWidthProperty().bind(root.getScene().widthProperty());
+        mainPane.prefHeightProperty().bind(root.getScene().heightProperty());
         timeBar = new SBXTimeBar(mainPane.prefWidthProperty());
-        
-        
+
         SBXManager.getInstance().setTimeBar(timeBar);
         barBoxY = timeBar.getBoundsInLocal().getHeight() * 3;
         viewerY = barBoxY;
@@ -60,25 +60,19 @@ public class StoryBoardX {
         mainPane.setOnMouseDragged(handler.getMouseHandler());
         mainPane.setOnMouseDragExited(handler.getMouseHandler());
 
-//        mainPane.setOnDragDone(handler.getDragHandler());
-//        mainPane.setOnDragOver(handler.getDragHandler());
-//        mainPane.setOnKeyPressed(handler.getKeyHandler());
-//        mainPane.setOnZoom(handler.getZoomHandler());
         root.getChildren().addAll(mainPane);
     }
 
-    public void addEventBar(SBXEventBar bar) {
+    public void addEventBar(String eventType, int height, Date start, int duration) {
+        SBXEventBar bar = new SBXEventBar(height, eventType, mainPane.widthProperty(), SBXEventItem.ColorScheme.SKY);
+        bar.init(start, duration);
         mainPane.getChildren().removeAll(viewer, timeBar);
-        bar.setTranslateY(viewerY);
+        bar.setLayoutY(viewerY);
         mainPane.getChildren().add(bar);
         barList.add(bar);
         viewerY += bar.getBoundsInLocal().getHeight() + 1;
-        viewer.setTranslateY(viewerY + 2);
+        viewer.setLayoutY(viewerY + 2);
         mainPane.getChildren().addAll(viewer, timeBar);
         timeBar.setLineVerticalPosition(barBoxY, viewerY - barBoxY);
-    }
-
-    public void addEventBar(Date sd, long td) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

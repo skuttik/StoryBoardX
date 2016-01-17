@@ -8,14 +8,9 @@ package storyboardx.ui;
 import java.text.DateFormat;
 import java.util.Date;
 import javafx.beans.property.ReadOnlyDoubleProperty;
-import javafx.geometry.Pos;
 import javafx.scene.effect.BlendMode;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.TilePane;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Line;
 import javafx.scene.shape.Polygon;
 import javafx.scene.text.Text;
 
@@ -32,7 +27,7 @@ public class SBXTimeBar extends Pane {
     private final Polygon currentLine;
 
     public SBXTimeBar(ReadOnlyDoubleProperty width) {
-        
+
         prefWidthProperty().bind(width);
         start = new Text("");
         start.setFill(Color.ALICEBLUE);
@@ -58,22 +53,25 @@ public class SBXTimeBar extends Pane {
 
     public void set(Date startDate, long totalDuration) {
         start.setText(DateFormat.getDateTimeInstance().format(startDate));
-        end.setText(DateFormat.getDateTimeInstance().format(new Date(startDate.getTime() + totalDuration)));
         start.setLayoutY(start.getBoundsInLocal().getHeight());
+
+        end.setText(DateFormat.getDateTimeInstance().format(new Date(startDate.getTime() + totalDuration)));
         end.layoutXProperty().bind(prefWidthProperty().subtract(end.getBoundsInLocal().getWidth()));
-        
-        
-        
         end.setLayoutY(end.getBoundsInLocal().getHeight());
+
         currentText.setLayoutY(end.getBoundsInLocal().getHeight() * 2);
         currentArrow.setLayoutY(end.getBoundsInLocal().getHeight() * 2.3);
         currentLine.setLayoutY(0);
     }
 
-    public void updateCurrentDate(Date currentDate, double x) {
-        currentText.setText(DateFormat.getDateTimeInstance().format(currentDate)+" ("+(int)(x/getPrefWidth()*100.0)+"%)");
+    public void updateCurrentDate(long startDate, long totalDuration, double x) {
+        double currW = prefWidthProperty().get();
+        double factor = x / currW;
+        long delta = (long) (factor * totalDuration);
+        Date currentDate = new Date(startDate + delta);
+        currentText.setText(DateFormat.getDateTimeInstance().format(currentDate) + " (" + Math.round(factor * 100.0) + "%)");
         int dim = (int) (currentText.getBoundsInLocal().getWidth());
-        currentText.setLayoutX(x - (dim * x / getPrefWidth()));
+        currentText.setLayoutX(x - (dim * x / currW));
         currentArrow.setLayoutX(x);
         currentArrow.setVisible(true);
         currentLine.setLayoutX(x);
