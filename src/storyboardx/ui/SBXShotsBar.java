@@ -7,12 +7,15 @@ package storyboardx.ui;
 
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.value.ObservableValue;
+import javafx.event.EventHandler;
 import javafx.scene.image.Image;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeType;
+import storyboardx.SBXManager;
 import storyboardx.data.SBXEvent;
 import storyboardx.data.SBXEventListener;
 
@@ -24,6 +27,31 @@ public class SBXShotsBar extends Pane implements SBXEventListener {
 
     private final double height;
     private final ReadOnlyDoubleProperty refSize;
+
+    private class MouseHandler implements EventHandler<MouseEvent> {
+
+        private final int id;
+
+        public MouseHandler(int id) {
+            this.id = id;
+        }
+
+        @Override
+        public void handle(MouseEvent event) {
+            switch (event.getEventType().getName()) {
+                case "MOUSE_ENTERED":
+                    break;
+                case "MOUSE_EXITED":
+                    break;
+                case "MOUSE_CLICKED":
+                    System.out.println("frame " + id);
+                    break;
+                default:
+                    System.out.println(event.getEventType().getName());
+                    break;
+            }
+        }
+    }
 
     public SBXShotsBar(int height, ReadOnlyDoubleProperty refSize) {
         this.height = height;
@@ -60,9 +88,9 @@ public class SBXShotsBar extends Pane implements SBXEventListener {
             frameRect.setStroke(Color.DARKGRAY);
             frameRect.setLayoutX(posX);
             getChildren().add(frameRect);
-            frameRect.setFill(new ImagePattern(new Image(getClass().getResourceAsStream("resources/emptyFrame.png"))));
-            posX += frameW + space;
+            frameRect.setFill(new ImagePattern(new Image(getClass().getResourceAsStream("resources/noFrame.png"))));
+            frameRect.addEventHandler(MouseEvent.MOUSE_CLICKED, new MouseHandler(i));
+        posX += frameW + space;
         }
     }
-
 }
