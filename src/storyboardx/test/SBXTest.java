@@ -39,9 +39,8 @@ public class SBXTest extends Application {
 
         int td = 120000;
         Date sd = new Date(new Date().getTime() - td);
-        double scale = w / td;
 
-        createEvents("test", 5, sd.getTime(), td);
+        createEvents("test", 8, sd.getTime(), td);
         sbx.addEventBar("test", h, sd, td);
 
         createEvents("abc", 8, sd.getTime(), td);
@@ -53,7 +52,7 @@ public class SBXTest extends Application {
         createEvents("poi", 8, sd.getTime(), td);
         sbx.addEventBar("poi", h, sd, td);
 
-        createEvents("kkk", 5, sd.getTime(), td);
+        createEvents("kkk", 8, sd.getTime(), td);
         sbx.addEventBar("kkk", h, sd, td);
 
         createEvents("ttt", 8, sd.getTime(), td);
@@ -62,6 +61,11 @@ public class SBXTest extends Application {
         createEvents("zxc", 8, sd.getTime(), td);
         sbx.addEventBar("zxc", h, sd, td);
 
+        sbx.addShotBar(h*4, sd, td);
+        sbx.addShotBar(h*4, sd, td);
+        sbx.addShotBar(h*4, sd, td);
+        sbx.addShotBar(h*4, sd, td);
+        
         primaryStage.setHeight(50 + SBXManager.getInstance().getEventTypes().size() * 45 + SBXEventViewer.height);
         primaryStage.show();
         SBXManager.getInstance().setTimeWindow(sd, td);

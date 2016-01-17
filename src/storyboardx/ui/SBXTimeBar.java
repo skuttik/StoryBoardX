@@ -96,9 +96,9 @@ public class SBXTimeBar extends Pane {
         currentLine.getPoints().add(lineY);
 
         currentLine.getPoints().add(lineW);
-        currentLine.getPoints().add(lineY + lineH);
+        currentLine.getPoints().add(lineY + lineH + 2);
 
         currentLine.getPoints().add(-lineW);
-        currentLine.getPoints().add(lineY + lineH);
+        currentLine.getPoints().add(lineY + lineH + 2);
     }
 }

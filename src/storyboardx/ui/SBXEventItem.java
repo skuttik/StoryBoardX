@@ -5,12 +5,9 @@
  */
 package storyboardx.ui;
 
-import com.sun.javafx.property.adapter.PropertyDescriptor;
 import java.util.ArrayList;
 import java.util.Date;
-import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ReadOnlyDoubleProperty;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
@@ -113,7 +110,6 @@ public class SBXEventItem implements EventHandler<MouseEvent> {
             s.setOnMouseExited(this);
         });
         refSize.addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
-            System.out.println("changed " + observable + ":" + oldValue + "->" + newValue);
             redraw();
         });
     }

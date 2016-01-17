@@ -13,6 +13,7 @@ import javafx.scene.Group;
 import javafx.scene.layout.Pane;
 import storyboardx.ui.SBXActionHandler;
 import storyboardx.ui.SBXEventItem;
+import storyboardx.ui.SBXShotsBar;
 import storyboardx.ui.SBXTimeBar;
 
 /**
@@ -21,9 +22,9 @@ import storyboardx.ui.SBXTimeBar;
  */
 public class StoryBoardX {
 
-    private final ArrayList<SBXEventBar> barList;
+    private final ArrayList<SBXEventBar> eventBarList;
+    private final ArrayList<SBXShotsBar> shotBarList;
     private double barBoxY = 0.0;
-    private double viewerY = 0.0;
     private SBXEventViewer viewer;
     private SBXTimeBar timeBar;
     private final Pane mainPane;
@@ -31,7 +32,8 @@ public class StoryBoardX {
 
     public StoryBoardX(Group root, double w) {
         mainPane = new Pane();
-        barList = new ArrayList<>();
+        eventBarList = new ArrayList<>();
+        shotBarList = new ArrayList<>();
         this.w = w;
         init(root);
     }
@@ -44,9 +46,8 @@ public class StoryBoardX {
 
         SBXManager.getInstance().setTimeBar(timeBar);
         barBoxY = timeBar.getBoundsInLocal().getHeight() * 3;
-        viewerY = barBoxY;
 
-        viewer = new SBXEventViewer(w);
+        viewer = new SBXEventViewer(mainPane.prefWidthProperty());
         SBXManager.getInstance().setViewer(viewer);
 
         mainPane.getChildren().addAll(timeBar, viewer);
@@ -63,16 +64,36 @@ public class StoryBoardX {
         root.getChildren().addAll(mainPane);
     }
 
+    public void addShotBar(int height, Date start, int duration) {
+        SBXShotsBar bar = new SBXShotsBar(height, mainPane.widthProperty());
+        shotBarList.add(bar);
+        organizeBars();
+    }
+
     public void addEventBar(String eventType, int height, Date start, int duration) {
         SBXEventBar bar = new SBXEventBar(height, eventType, mainPane.widthProperty(), SBXEventItem.ColorScheme.SKY);
         bar.init(start, duration);
-        mainPane.getChildren().removeAll(viewer, timeBar);
-        bar.setLayoutY(viewerY);
-        mainPane.getChildren().add(bar);
-        barList.add(bar);
-        viewerY += bar.getBoundsInLocal().getHeight() + 1;
-        viewer.setLayoutY(viewerY + 2);
+        eventBarList.add(bar);
+        organizeBars();
+    }
+
+    public void organizeBars() {
+        mainPane.getChildren().removeAll(timeBar, viewer);
+        mainPane.getChildren().removeAll(shotBarList);
+        mainPane.getChildren().removeAll(eventBarList);
+        double ly = barBoxY;
+        for (SBXShotsBar sb : shotBarList) {
+            sb.setLayoutY(ly + 2);
+            ly += sb.getBoundsInLocal().getHeight() + 2;
+            mainPane.getChildren().add(sb);
+        }
+        for (SBXEventBar eb : eventBarList) {
+            eb.setLayoutY(ly + 2);
+            ly += eb.getBoundsInLocal().getHeight() + 2;
+            mainPane.getChildren().add(eb);
+        }
         mainPane.getChildren().addAll(viewer, timeBar);
-        timeBar.setLineVerticalPosition(barBoxY, viewerY - barBoxY);
+        timeBar.setLineVerticalPosition(barBoxY, ly - barBoxY);
+        viewer.setLayoutY(ly+2);
     }
 }

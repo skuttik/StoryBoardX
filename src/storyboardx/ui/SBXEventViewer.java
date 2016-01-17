@@ -6,6 +6,7 @@
 package storyboardx.ui;
 
 import java.text.DateFormat;
+import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
@@ -30,7 +31,7 @@ public class SBXEventViewer extends Pane {
     private final ImageView icon3;
     private final Rectangle backgroundBar;
 
-    public SBXEventViewer(double width) {
+    public SBXEventViewer(ReadOnlyDoubleProperty width) {
         HBox main = new HBox(5);
 
         icon1 = new ImageView(new Image(getClass().getResourceAsStream("resources/bell.png")));
@@ -57,10 +58,12 @@ public class SBXEventViewer extends Pane {
 
         main.getChildren().addAll(new Text(""), icon1, identification, new Text(""), icon2, timeInfo, new Text(""), icon3, description);
 
-        backgroundBar = new Rectangle(width, height, new Color(0.9, 0.9, 0.9, 0.4));
+        backgroundBar = new Rectangle(10, height, new Color(0.9, 0.9, 0.9, 0.4));
 
         getChildren().addAll(backgroundBar, main);
 
+        backgroundBar.widthProperty().bind(width);
+        
         setMouseTransparent(true);
         clearEventInfo();
     }
