@@ -8,9 +8,12 @@ package storyboardx;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Set;
+import javafx.scene.paint.ImagePattern;
+import javafx.scene.shape.Rectangle;
 import storyboardx.data.SBXEvent;
 import storyboardx.data.SBXEventManager;
 import storyboardx.ui.SBXEventViewer;
+import storyboardx.ui.SBXShotPreview;
 import storyboardx.ui.SBXTimeBar;
 
 /**
@@ -22,9 +25,11 @@ public class SBXManager {
     private static SBXManager instance = null;
     private SBXEventViewer viewer = null;
     private SBXTimeBar timeBar = null;
+    private SBXShotPreview shotPreview = null;
     private Date startDate;
     private long totalDuration;
     private final HashMap<String, SBXEventManager> managerMap;
+    private Rectangle shotPreviewRect;
 
     private SBXManager() {
         managerMap = new HashMap<>();
@@ -38,9 +43,28 @@ public class SBXManager {
     }
 
     /*
+     Shot preview management
+     */
+    public void setShotPreview(SBXShotPreview shotPreview) {
+       this.shotPreview = shotPreview;
+    }
+
+    public void showShotPreview(ImagePattern imagePattern, double positionX, double positionY) {
+        shotPreview.show(imagePattern, positionX, positionY);
+    }
+
+    public void movePreview(double positionX, double positionY) {
+        shotPreview.moveTo(positionX, positionY);
+    }
+    
+    public void hideShotPreview() {
+        shotPreview.hide();
+    }
+    /*
      Event Viewer management
      */
-    void setViewer(SBXEventViewer viewer) {
+
+    public void setViewer(SBXEventViewer viewer) {
         this.viewer = viewer;
     }
 

@@ -82,15 +82,8 @@ public class SBXShotsBar extends Pane implements SBXEventListener {
         int space = (int) Math.floor((width - frameNum * frameW) / (frameNum - 1));
         double posX = 0;
         for (int i = 0; i < frameNum; i++) {
-            Rectangle frameRect = new Rectangle(frameW, height, Color.DIMGRAY);
-            frameRect.setStrokeWidth(height * .03);
-            frameRect.setStrokeType(StrokeType.INSIDE);
-            frameRect.setStroke(Color.DARKGRAY);
-            frameRect.setLayoutX(posX);
-            getChildren().add(frameRect);
-            frameRect.setFill(new ImagePattern(new Image(getClass().getResourceAsStream("resources/noFrame.png"))));
-            frameRect.addEventHandler(MouseEvent.MOUSE_CLICKED, new MouseHandler(i));
-        posX += frameW + space;
+            getChildren().add(new SBXShotItem(height, frameW, posX, (double) i / (double) frameNum).getItem());
+            posX += frameW + space;
         }
     }
 }

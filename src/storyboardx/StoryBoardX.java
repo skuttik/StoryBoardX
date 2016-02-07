@@ -11,8 +11,10 @@ import storyboardx.ui.SBXEventViewer;
 import storyboardx.ui.SBXEventBar;
 import javafx.scene.Group;
 import javafx.scene.layout.Pane;
+import javafx.scene.shape.Rectangle;
 import storyboardx.ui.SBXActionHandler;
 import storyboardx.ui.SBXEventItem;
+import storyboardx.ui.SBXShotPreview;
 import storyboardx.ui.SBXShotsBar;
 import storyboardx.ui.SBXTimeBar;
 
@@ -29,6 +31,7 @@ public class StoryBoardX {
     private SBXTimeBar timeBar;
     private final Pane mainPane;
     private double w = 1500;
+    private Rectangle shotPreviewRectangle;
 
     public StoryBoardX(Group root, double w) {
         mainPane = new Pane();
@@ -39,18 +42,20 @@ public class StoryBoardX {
     }
 
     private void init(Group root) {
-
         mainPane.prefWidthProperty().bind(root.getScene().widthProperty());
         mainPane.prefHeightProperty().bind(root.getScene().heightProperty());
-        timeBar = new SBXTimeBar(mainPane.prefWidthProperty());
 
+        timeBar = new SBXTimeBar(mainPane.prefWidthProperty());
         SBXManager.getInstance().setTimeBar(timeBar);
         barBoxY = timeBar.getBoundsInLocal().getHeight() * 3;
 
         viewer = new SBXEventViewer(mainPane.prefWidthProperty());
         SBXManager.getInstance().setViewer(viewer);
-
         mainPane.getChildren().addAll(timeBar, viewer);
+
+        SBXShotPreview shotPreview = new SBXShotPreview(200, mainPane.widthProperty());
+        shotPreviewRectangle = shotPreview.getRectangle();
+        SBXManager.getInstance().setShotPreview(shotPreview);
 
         SBXActionHandler handler = new SBXActionHandler();
 
@@ -78,7 +83,7 @@ public class StoryBoardX {
     }
 
     public void organizeBars() {
-        mainPane.getChildren().removeAll(timeBar, viewer);
+        mainPane.getChildren().removeAll(timeBar, viewer, shotPreviewRectangle);
         mainPane.getChildren().removeAll(shotBarList);
         mainPane.getChildren().removeAll(eventBarList);
         double ly = barBoxY;
@@ -92,8 +97,8 @@ public class StoryBoardX {
             ly += eb.getBoundsInLocal().getHeight() + 2;
             mainPane.getChildren().add(eb);
         }
-        mainPane.getChildren().addAll(viewer, timeBar);
+        mainPane.getChildren().addAll(viewer, shotPreviewRectangle, timeBar);
         timeBar.setLineVerticalPosition(barBoxY, ly - barBoxY);
-        viewer.setLayoutY(ly+2);
+        viewer.setLayoutY(ly + 2);
     }
 }
